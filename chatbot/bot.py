@@ -33,7 +33,6 @@ def telegram_bot():
     app.add_handler(MessageHandler(MessageFilter, message_handler))
     app.add_handler(CallbackQueryHandler(button_callback))
     app.job_queue.run_daily(broadcast_daily, time(hour=7, minute=0, second=0, tzinfo=timezone('Asia/Phnom_Penh')))
-    # app.job_queue.run_repeating(broadcast_daily, interval=timedelta(minutes=1))
 
     # Run the bot until the user presses Ctrl-C
     app.run_polling(allowed_updates=Update.ALL_TYPES)

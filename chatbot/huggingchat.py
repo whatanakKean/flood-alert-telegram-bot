@@ -28,9 +28,9 @@ def generate_response(message: str, station: str = "PPB", forecast_days: int = 5
 
     # Check if data was successfully retrieved, providing default text if unavailable
     forecast_info = forecast_data if forecast_data else "Forecast data is unavailable."
-    water_level_info = water_level if water_level else "Water Level data is unavailable."
-    rainfall_info = rainfall if rainfall else "Rainfall data is unavailable."
-    water_flow_info = water_flow if water_flow else "Water Flow data is unavailable."
+    water_level_info = water_level if water_level else "Water Level is 5m (Testing Response)"
+    rainfall_info = rainfall if rainfall else "Rainfall data is 5mm/day (Testing Response)"
+    water_flow_info = water_flow if water_flow else "Water Flow is 5L/s (Testing Response)."
 
     # Build the context with factual information
     context = f"""
