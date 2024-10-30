@@ -17,29 +17,16 @@ else:
 chatbot = hugchat.ChatBot(cookies=cookies.get_dict())
 
 
-def generate_response(message: str, station: str = "PPB", forecast_days: int = 5, time_range: str = "15d"):
+def generate_response(message: str, context_data: str, station: str = "bassac", forecast_days: int = 5, time_range: str = "1d"):
     """Generate a response to a message"""
     response_queue = ""
 
-    forecast_data = predict_water_level(forward_days=forecast_days)
-    water_level = fetch_measurement(station=station, time_range=time_range, measurement="water_level")
-    rainfall = fetch_measurement(station=station, time_range=time_range, measurement="rainfall")
-    water_flow = fetch_measurement(station=station, time_range=time_range, measurement="water_flow")
-
-    # Check if data was successfully retrieved, providing default text if unavailable
-    forecast_info = forecast_data if forecast_data else "Forecast data is unavailable."
-    water_level_info = water_level if water_level else "Water Level is 5m (Testing Response)"
-    rainfall_info = rainfall if rainfall else "Rainfall data is 5mm/day (Testing Response)"
-    water_flow_info = water_flow if water_flow else "Water Flow is 5L/s (Testing Response)."
 
     # Build the context with factual information
     context = f"""
     >>> Here is additional factual information you can use as a reference if asked
 
-    + Water Level Forecast (Next {forecast_days} days): {forecast_info}
-    + Current Water Level Data for {station} (Last {time_range}): {water_level_info}
-    + Current Rainfall Data for {station} (Last {time_range}): {rainfall_info}
-    + Current Water Flow Data for {station} (Last {time_range}): {water_flow_info}
+    {context_data}
     """
     
     for resp in chatbot.chat(

@@ -9,7 +9,7 @@ from telegram.error import NetworkError, BadRequest
 from telegram.constants import ChatAction, ParseMode
 from chatbot.html_format import format_message
 from chatbot.huggingchat import chatbot, generate_response
-from chatbot.queries import fetch_metadata, predict_water_level
+from chatbot.queries import fetch_measurement, fetch_metadata, predict_water_level
 from chatbot.user import UserManager
 
 # Bot Configuration
@@ -19,8 +19,9 @@ DEFAULT_MODEL_INDEX = 0
 FIXED_SYSTEM_PROMPT = f"""
     You are a chatbot called Flood Alert, and your response will only be about Flood and Hydrometeorological Monitoring.
 
-    If the prompt is related to real data that is not given, just say you don't know.  
+    If the prompt is related to real data that is not given, just say you don't know and refer them to this site https://floodalert.live/
 """
+context_data = None
 
 
 # Initialize UserManager
@@ -43,7 +44,13 @@ async def start(update: Update, _: ContextTypes.DEFAULT_TYPE) -> None:
 
     # Send the message with buttons
     await update.message.reply_html(
-        f"""Greeting {user.mention_html()}!""",
+        f"""<b>🌧️ Greetings, {user.mention_html()}!</b>\n\n
+Welcome to <i>Flood Alert</i>! Your go-to source for hydrometeorological updates.\n
+
+💬 How can I assist you today?
+
+
+🌐 Visit us at: <a href="https://floodalert.live/">floodalert.live</a>\n""",
         reply_markup=reply_markup
     )
 
@@ -80,9 +87,7 @@ async def image_station_selection(query, is_unsubscribe: bool = False) -> None:
 async def send_location_image(query, context: ContextTypes.DEFAULT_TYPE, location: str) -> None:
     """Send the latest image of the selected location to the user.""" 
     location_images = {
-        "Phnom Penh (Bassac)": 'https://www.khmertimeskh.com/wp-content/uploads/2024/08/Phnom-Penh-condos-riverside-living.jpg',
-        "Siem Reap": 'https://upload.wikimedia.org/wikipedia/commons/3/31/Siem_Reap_river.JPG',
-        "Battambang": 'https://media-cdn.tripadvisor.com/media/photo-s/06/ea/54/9e/battambang-river-from.jpg'
+        "bassac": 'https://www.khmertimeskh.com/wp-content/uploads/2024/08/Phnom-Penh-condos-riverside-living.jpg'
     }
 
     image_path = location_images.get(location, None)
@@ -155,8 +160,12 @@ async def message_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) ->
         return
 
     full_output_message = ""
+
+    if context_data is None:
+        await fetch_data(context)
+
     await update.message.chat.send_action(ChatAction.TYPING)
-    for message in generate_response(message):
+    for message in generate_response(message, context_data):
         if message:
             full_output_message += message
             send_message = format_message(full_output_message)
@@ -187,3 +196,43 @@ async def broadcast_daily(context: ContextTypes.DEFAULT_TYPE) -> None:
                 await context.bot.send_message(chat_id=chat_id, text=message)
             except Exception as e:
                 print(f"Error sending message to {chat_id}: {e}")
+
+
+async def fetch_data(context: ContextTypes.DEFAULT_TYPE) -> None:
+    global context_data
+
+    
+    try:
+        forecast_data = predict_water_level(forward_days=5)
+    except (KeyError, IndexError, TypeError):
+        forecast_data = None
+
+    try:
+        water_level = fetch_measurement(station="bassac", range="15d", measurement="water_level")['data'][-1]
+    except (KeyError, IndexError, TypeError):
+        water_level = None
+
+    try:
+        rainfall = fetch_measurement(station="bassac", range="15d", measurement="rainfall")['data'][-1]
+    except (KeyError, IndexError, TypeError):
+        rainfall = None
+
+    try:
+        water_flow = fetch_measurement(station="bassac", range="15d", measurement="water_flow")['data'][-1]
+    except (KeyError, IndexError, TypeError):
+        water_flow = None
+
+    print("Forecast Data:", forecast_data)
+    print("Water Level:", water_level)
+    print("Rainfall:", rainfall)
+    print("Water Flow:", water_flow)
+
+    context_data = {
+        "forecast_info": forecast_data if forecast_data else "Forecast data is unavailable at the moment.",
+        "water_level_info": water_level if water_level else "Water Level is unavailable at the moment.",
+        "rainfall_info": rainfall if rainfall else "Rainfall data is unavailable at the moment.",
+        "water_flow_info": water_flow if water_flow else "Water Flow is unavailable at the moment."
+    }
+
+    print(context_data)
+    

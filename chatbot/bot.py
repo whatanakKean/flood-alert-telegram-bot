@@ -17,6 +17,7 @@ from chatbot.handlers import (
     message_handler,
     new_session,
     broadcast_daily,
+    fetch_data,
     SYSTEM_PROMPT_SP,
     CANCEL_SP
 )
@@ -33,6 +34,7 @@ def telegram_bot():
     app.add_handler(MessageHandler(MessageFilter, message_handler))
     app.add_handler(CallbackQueryHandler(button_callback))
     app.job_queue.run_daily(broadcast_daily, time(hour=7, minute=0, second=0, tzinfo=timezone('Asia/Phnom_Penh')))
+    app.job_queue.run_repeating(fetch_data, interval=300, first=0)
 
     # Run the bot until the user presses Ctrl-C
     app.run_polling(allowed_updates=Update.ALL_TYPES)
