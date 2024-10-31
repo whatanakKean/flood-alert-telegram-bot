@@ -3,7 +3,7 @@ from telegram import Update
 from telegram.ext.filters import UpdateFilter, COMMAND, TEXT, PHOTO
 from dotenv import load_dotenv
 
-load_dotenv()
+load_dotenv(override=True)
 
 _AUTHORIZED_USERS = [
     i.strip() for i in os.getenv("AUTHORIZED_USERS", "").split(",") if i.strip()

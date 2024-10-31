@@ -3,12 +3,10 @@ from dotenv import load_dotenv
 import os
 
 # Load environment variables from .env file
-load_dotenv()
+load_dotenv(override=True)
 
 # Fetch variables from the .env file
 PREDICT_API_URL = os.getenv("PREDICT_API_URL")
-FLOOD_ALERT_API_URL = os.getenv("FLOOD_ALERT_API_URL")
-FLOOD_ALERT_IMAGE_API_URL = os.getenv("FLOOD_ALERT_IMAGE_API_URL")
 TOKEN = os.getenv("TOKEN")
 REFRESH_TOKEN = os.getenv("REFRESH_TOKEN")
 TOKEN_REFRESH_URL = os.getenv("TOKEN_REFRESH_URL")
@@ -32,23 +30,28 @@ def predict_water_level(forward_days=5):
     except Exception as e:
         return f"An error occurred: {e}"
 
-def refresh_access_token(username, password, refresh_token):
+def refresh_access_token(username, password):
     url = os.getenv('LOGIN_URL')  # Get the login URL from environment variable
+
+    if not url:
+        print("Error: LOGIN_URL environment variable is not set.")
+        return None
     
     # Prepare the headers
     headers = {
         'accept': 'application/json',
-        'Content-Type': 'application/x-www-form-urlencoded'
+        'Content-Type': 'application/x-www-form-urlencoded',
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'  # Mimic a browser
     }
     
     # Prepare the data payload
     data = {
         'grant_type': 'password',
-        'refresh_token': refresh_token,
         'username': username,  # Include username
         'password': password,  # Include password
-        'client_id': 'string',  # Replace with actual client_id if needed
-        'client_secret': ''      # Replace with actual client_secret if needed
+        'scope': '',  # Optional, remove if not needed
+        'client_id': None,  # Remove if not required
+        'client_secret': None  # Remove if not required
     }
     
     # Send the POST request
@@ -81,8 +84,12 @@ def fetch_measurement(station="bassac", range="15d", measurement="water_level"):
     }
     
     response = requests.get(url, headers=headers, params=params)
-    # print(response.status_code)
-    # exit()
+    from urllib.parse import urlencode
+    full_url = f"{url}?{urlencode(params)}"
+    print("Full URL:", full_url)
+    print(response.status_code)
+    print(headers)
+    exit()
     
     if response.status_code == 200:
         return response.json()
@@ -156,4 +163,5 @@ def fetch_metadata():
 
 if __name__ == "__main__":
     # Access the environment variables
-    print(fetch_measurement()['data'][-1])
+    # print(fetch_measurement()['data'][-1])
+    print(refresh_access_token("nak", "nak"))

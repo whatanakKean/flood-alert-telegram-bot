@@ -24,7 +24,7 @@ from chatbot.handlers import (
 from chatbot.filters import AuthFilter, MessageFilter
 from dotenv import load_dotenv
 from datetime import timedelta
-load_dotenv()
+load_dotenv(override=True)
 
 
 def telegram_bot():

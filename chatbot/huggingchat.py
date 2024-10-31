@@ -5,7 +5,7 @@ from hugchat import hugchat
 from hugchat.login import Login
 from dotenv import load_dotenv
 
-load_dotenv()
+load_dotenv(override=True)
 
 if os.getenv("HF_EMAIL") and os.getenv("HF_PASSWORD"):
     sign = Login(os.getenv("HF_EMAIL"), os.getenv("HF_PASSWORD"))
