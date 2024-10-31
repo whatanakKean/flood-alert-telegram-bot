@@ -21,8 +21,6 @@ FIXED_SYSTEM_PROMPT = f"""
 
     If the prompt is related to real data that is not given, just say you don't know and refer them to this site https://floodalert.live/
 """
-context_data = None
-
 
 # Initialize UserManager
 user_manager = UserManager()
@@ -64,8 +62,8 @@ async def button_callback(update: Update, context: ContextTypes.DEFAULT_TYPE) ->
     elif query.data == 'image':
         await image_station_selection(query)
     elif query.data.startswith("station_"):
-        location = query.data[len("station_"):]
-        await send_location_image(query, context, location)
+        station = query.data[len("station_"):]
+        await send_location_image(query, context, station)
     elif query.data == 'subscribe':
         await subscription_station_selection(query)  # Send a new message for subscription
     elif query.data == 'unsubscribe':
@@ -161,9 +159,6 @@ async def message_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) ->
 
     full_output_message = ""
 
-    if context_data is None:
-        await fetch_data(context)
-
     await update.message.chat.send_action(ChatAction.TYPING)
     for message in generate_response(message, context_data):
         if message:
@@ -222,13 +217,8 @@ async def fetch_data(context: ContextTypes.DEFAULT_TYPE) -> None:
     except (KeyError, IndexError, TypeError):
         water_flow = None
 
-    print("Forecast Data:", forecast_data)
-    print("Water Level:", water_level)
-    print("Rainfall:", rainfall)
-    print("Water Flow:", water_flow)
-
     context_data = {
-        "forecast_info": forecast_data if forecast_data else "Forecast data is unavailable at the moment.",
+        "water_level_forecast": forecast_data if forecast_data else "Forecast data is unavailable at the moment.",
         "water_level_info": water_level if water_level else "Water Level is unavailable at the moment.",
         "rainfall_info": rainfall if rainfall else "Rainfall data is unavailable at the moment.",
         "water_flow_info": water_flow if water_flow else "Water Flow is unavailable at the moment."

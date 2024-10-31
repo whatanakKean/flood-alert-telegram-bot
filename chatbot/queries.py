@@ -84,12 +84,6 @@ def fetch_measurement(station="bassac", range="15d", measurement="water_level"):
     }
     
     response = requests.get(url, headers=headers, params=params)
-    from urllib.parse import urlencode
-    full_url = f"{url}?{urlencode(params)}"
-    print("Full URL:", full_url)
-    print(response.status_code)
-    print(headers)
-    exit()
     
     if response.status_code == 200:
         return response.json()
