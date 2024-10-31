@@ -179,9 +179,9 @@ async def broadcast_daily(context: ContextTypes.DEFAULT_TYPE) -> None:
                 f"🌊 **Daily Flood Report for {station}**\n\n"
                 "Stay safe and updated on the current situation!\n\n"
                 f"**Location**: {station}\n"
-                f"**Water Level**: 10 meters\n"
-                f"**Rainfall**: 10 mm/day\n"
-                f"**Waterflow**: 10 L/s\n\n"
+                f"**Water Level**: {context_data['water_level_info']}\n"
+                f"**Rainfall**: {context_data['rainfall_info']}\n"
+                f"**Waterflow**: {context_data['water_flow_info']}\n\n"
                 "**Forecast**\n"
                 f"Predicted Water Level: {predict_water_level()} meters\n\n"
                 "Stay alert and take precautions if needed! 🚨"
@@ -224,5 +224,5 @@ async def fetch_data(context: ContextTypes.DEFAULT_TYPE) -> None:
         "water_flow_info": water_flow if water_flow else "Water Flow is unavailable at the moment."
     }
 
-    print(context_data)
+    print(context_data['water_level_info'])
     
