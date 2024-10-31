@@ -224,5 +224,5 @@ async def fetch_data(context: ContextTypes.DEFAULT_TYPE) -> None:
         "water_flow_info": water_flow if water_flow else "Water Flow is unavailable at the moment."
     }
 
-    print(context_data['water_level_info'])
+    print(context_data)
     

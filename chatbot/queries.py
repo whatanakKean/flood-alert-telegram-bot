@@ -84,16 +84,15 @@ def fetch_measurement(station="bassac", range="15d", measurement="water_level"):
     }
     
     response = requests.get(url, headers=headers, params=params)
-    
+
     if response.status_code == 200:
         return response.json()
     elif response.status_code == 403: 
         username = os.getenv('USERNAME')
         password = os.getenv('PASSWORD')
-        refresh_token = os.getenv('REFRESH_TOKEN')
 
         # Try refreshing the token
-        token = refresh_access_token(username, password, refresh_token)
+        token = refresh_access_token(username, password)
         
         if token:  # Check if we got a new token
             headers['Authorization'] = f"Bearer {token}"
@@ -130,10 +129,9 @@ def fetch_image_data(station="bassac", range="15d"):
         # Retrieve credentials from environment variables
         username = os.getenv('USERNAME')
         password = os.getenv('PASSWORD')
-        refresh_token = os.getenv('REFRESH_TOKEN')
 
         # Try refreshing the token
-        token = refresh_access_token(username, password, refresh_token)
+        token = refresh_access_token(username, password)
         
         if token:  # Check if we got a new token
             headers['Authorization'] = f"Bearer {token}"
@@ -157,5 +155,4 @@ def fetch_metadata():
 
 if __name__ == "__main__":
     # Access the environment variables
-    # print(fetch_measurement()['data'][-1])
-    print(refresh_access_token("nak", "nak"))
+    print(fetch_measurement()['data'])

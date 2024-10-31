@@ -1,0 +1,14 @@
+version: '3.8'  # Specify the version of Docker Compose
+
+services:
+  app:  # Name of the service
+    build:
+      context: .  # Build context, where Dockerfile is located
+      dockerfile: Dockerfile  # Name of the Dockerfile
+    volumes:
+      - .:/app  # Mount the current directory to /app in the container
+    ports:
+      - "8000:8000"  # Map port 8000 on the host to port 8000 in the container (adjust if necessary)
+    environment:
+      - SOME_ENV_VAR=value  # Add any environment variables your app needs
+    restart: unless-stopped  # Restart policy
